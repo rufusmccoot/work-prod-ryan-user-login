@@ -91,7 +91,7 @@ $artifactName = "log.txt"
     $sourceFilePath = Join-Path -Path $destinationPath -ChildPath $artifactBaseName
     $interface3Folder = Join-Path $sourceFilePath "03_DailyImports"
 
-    $etlReportFile = Get-ChildItem -Path $interface3Folder -File -Filter "*ETLRPT*" | Select-Object -First 1
+    $etlReportFile = Get-ChildItem -Path $interface3Folder -File -Filter "*ETLR*" | Select-Object -First 1
 
     $contents = Get-Content -Path $etlReportFile.FullName -Raw
 
