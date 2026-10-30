@@ -49,20 +49,21 @@ function fnGet-ArtifactFromPipeline {
         $latestBuild                       = $latestRunResponse.value | Select-Object -First 1
 
         if ($latestBuild) {
+            $latestRunId                   = $latestBuild.id
+            $latestRunTime                 = [datetime]::Parse($latestBuild.QueueTime)
+            $latestRunTimeEastern          = [TimeZoneInfo]::ConvertTime($latestRunTime, $easternTimeZone)
+
             if ($latestBuild.Result -eq "failed") {
                 Write-Host -Fore Red "[Pipeline failed]"
-                $fileNameDatePrefix = Get-Date -Format 'yyyy-MM-dd'
-                $destinationFile    = Join-Path -Path $finalDestination -ChildPath "$fileNameDatePrefix ryan_user_login_report FAILED.csv"
-                "The ADO pipeline failed today so there is no output to provide" | Set-Content -Path $destinationFile
+                $latestRunResultsURLForWebBrowser = "https://dev.azure.com/$organization/$project/_build/results?buildId=$latestRunId&view=results"
+                $fileNameDatePrefix               = Get-Date -Format 'yyyy-MM-dd'
+                $destinationFile                  = Join-Path -Path $finalDestination -ChildPath "$fileNameDatePrefix ryan_user_login_report FAILED.csv"
+                "The ADO pipeline failed today so there is no output to provide.`r`nView results here:,$latestRunResultsURLForWebBrowser" | Set-Content -Path $destinationFile
                 Write-Host ""
                 Write-Host -Fore Red "Created failure file at $destinationFile"
                 fnShow-Results Red
                 exit
             }
-
-            $latestRunId                   = $latestBuild.id
-            $latestRunTime                 = [datetime]::Parse($latestBuild.QueueTime)
-            $latestRunTimeEastern          = [TimeZoneInfo]::ConvertTime($latestRunTime, $easternTimeZone)
 
             if ($latestRunTimeEastern.Date -eq [TimeZoneInfo]::ConvertTime([datetime]::UtcNow, $easternTimeZone).Date) {
                 Write-Host -ForegroundColor Cyan "[YES]"
@@ -73,6 +74,7 @@ function fnGet-ArtifactFromPipeline {
                 Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz') Waiting ten minutes to check again"
             }
         }
+
         else {
             Write-Host -ForegroundColor Red "[NO, Looks like the pipeline has never ran]"
             Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz') Waiting ten minutes to check again"
