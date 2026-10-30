@@ -57,8 +57,8 @@ function fnGet-ArtifactFromPipeline {
                 Write-Host -Fore Red "[Pipeline failed]"
                 $latestRunResultsURLForWebBrowser = "https://dev.azure.com/$organization/$project/_build/results?buildId=$latestRunId&view=results"
                 $fileNameDatePrefix               = Get-Date -Format 'yyyy-MM-dd'
-                $destinationFile                  = Join-Path -Path $finalDestination -ChildPath "$fileNameDatePrefix ryan_user_login_report FAILED.csv"
-                "The ADO pipeline failed today so there is no output to provide.`r`nView results here:,$latestRunResultsURLForWebBrowser" | Set-Content -Path $destinationFile
+                $destinationFile                  = Join-Path -Path $finalDestination -ChildPath "$fileNameDatePrefix ryan_user_login_report ADO_PIPELINE_FAILED.csv"
+                "The ADO pipeline failed today so there is no output to provide.`r`nResults:,$latestRunResultsURLForWebBrowser" | Set-Content -Path $destinationFile
                 Write-Host ""
                 Write-Host -Fore Red "Created failure file at $destinationFile"
                 fnShow-Results Red
