@@ -7,7 +7,21 @@ $project = "TrackerPRO"
 $artifactName = "ryan_user_login_report" # The name of the artifact container, not necessarily the file
 $pipelineId = "2601"
 $finalDestination = "C:\Users\rc04729\OneDrive - Ryan LLC\Shortcuts\Marta Bauer's files - Hosted Users"
+$logfile = ".\log.txt"
 
+# Function to display things to console while also logging the same strings
+function fnLogAndDisplay {
+    param(
+        [string]$message,
+        [string]$color = "White" # optional param to effect console message display, no effect on file logging
+    )
+    $timeypoo = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $timestampedMessage = "$timeypoo - $message"
+    Add-content "$logfile" $timestampedMessage
+    Write-Host -Fore $color $timestampedMessage
+}
+
+fnLogAndDisplay -message "*********************************** BEGIN ***********************************"
 
 # Get credentials from secrets.txt
 $secretsFile = "secrets.txt"
@@ -60,7 +74,7 @@ function fnGet-ArtifactFromPipeline {
                 $destinationFile                  = Join-Path -Path $finalDestination -ChildPath "$fileNameDatePrefix ryan_user_login_report ADO_PIPELINE_FAILED.csv"
                 "The ADO pipeline failed today so there is no output to provide.`r`nResults:,$latestRunResultsURLForWebBrowser" | Set-Content -Path $destinationFile
                 Write-Host ""
-                Write-Host -Fore Red "Created failure file at $destinationFile"
+                fnLogAndDisplay -color Red -message "ADO pipeline failed today, created failure file at $destinationFile"
                 fnShow-Results Red
                 exit
             }
@@ -121,6 +135,7 @@ function fnShow-Results {
     Write-Host ""
     Write-Host -fore $color "Pausing for $howLongToShowLog seconds..."
     Write-Host -fore $color "This screen will automatically close at $logDisplayUntil..."
+    fnLogAndDisplay -message "***********************************  END  ***********************************"
     Start-Sleep $howLongToShowLog
 }
 
